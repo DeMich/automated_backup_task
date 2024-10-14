@@ -1,4 +1,4 @@
-## nas_share_backup_script.py\par
+## nas_share_backup_script.py
 
 import subprocess
 from datetime import datetime
