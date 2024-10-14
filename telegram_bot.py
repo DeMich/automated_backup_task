@@ -16,9 +16,6 @@ def send_message(msg):
     
     # Check if the request was successful
     if response.status_code != 200:
-        print(f"Failed to send message, API response code: {response.text}")
-    else
-        print(f"Succesful sending message, API response code: {response.text}")
-    
-    return response
-    
+        return f"Failed to send message, API response code: {response.text}"
+    else:
+        return f"Succesful sending message, API response code: {response.text}" 
