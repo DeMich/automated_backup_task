@@ -26,6 +26,6 @@ else:
 #log summary
 with open(log_file, 'a') as log:
   log.write(f"Backup on: {datetime.now()}\n")
-  log.write(f"telegram_bot.py api response: {telegram_response}")
+  log.write(telegram_response)
   log.write(summary_content)
 
