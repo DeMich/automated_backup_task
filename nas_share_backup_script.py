@@ -18,7 +18,8 @@ process = subprocess.run(rsync_command, capture_output=True, text=True)
 summary_content = process.stdout + process.stderr
 
 #Error check and send message with telegram bot
-if process.returncode != 0:
+if process.returncode:
+#if statement boolean, everything true then...
   telegram_response = send_message(f"FAILED auto-backup NAS '/share/'-->'/share_backup/': \n errorcode: {process.returncode} \n{summary_content}")
 else:
   telegram_response = send_message(f"SUCCESFUL auto-backup NAS '/share/'-->'/share_backup/': \n {summary_content}")
