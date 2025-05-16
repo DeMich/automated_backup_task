@@ -3,6 +3,7 @@
 import subprocess
 from datetime import datetime
 from telegram_bot import send_message
+import time
 
 #settings
 source = '//share/'
@@ -29,4 +30,10 @@ with open(log_file, 'a') as log:
   log.write(f"Backup on: {datetime.now()}\n")
   log.write(f"telegram_response: {telegram_response}\n")
   log.write(summary_content + "\n")
+
+# Wait a bit to ensure all writes are finished
+time.sleep(10)
+#get /dev/sdX from UUID
+DEVICE=$(blkid -U 3D44E146065881FD)
+sudo hdparm -y "$DEVICE"
 
