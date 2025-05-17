@@ -1,41 +1,55 @@
-## nas_share_backup_script.py
-
 import subprocess
 from datetime import datetime
 from telegram_bot import send_message
 import time
+import json
 
-#settings
-source = '//share/'
-destination = '//share_backup/'
-log_file = '/home/demich/backup/share_backup.log'
-summary_file = '/tmp/rsync-summary'
+# Load configuration from JSON file
+with open('backup_config_nas.json', 'r') as config_file:
+    config = json.load(config_file)
 
-#rsync command
+source = config['source']
+destination = config['destination']
+uuid = config['uuid']
+log_file = config['log_file']
+
+# Rsync command
 rsync_command = ['rsync', '-a', '--stats', '--human-readable', source, destination]
 process = subprocess.run(rsync_command, capture_output=True, text=True)
 
-#summary_content preparation
+# Prepare log message
+timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 summary_content = process.stdout + process.stderr
 
-#Error check and send message with telegram bot
 if process.returncode:
-#if statement boolean, everything true then...
-  telegram_response = send_message(f"FAILED auto-backup NAS '/share/'-->'/share_backup/': \n errorcode: {process.returncode} \n{summary_content}")
+    status = "FAILURE"
+    message = (
+        f"[{timestamp}] BACKUP STATUS: {status}\n"
+        f"Source: {source}\n"
+        f"Destination: {destination}\n"
+        f"Error Code: {process.returncode}\n"
+        f"Details:\n{summary_content}"
+    )
 else:
-  telegram_response = send_message(f"SUCCESFUL auto-backup NAS '/share/'-->'/share_backup/': \n {summary_content}")
+    status = "SUCCESS"
+    message = (
+        f"[{timestamp}] BACKUP STATUS: {status}\n"
+        f"Source: {source}\n"
+        f"Destination: {destination}\n"
+        f"Details:\n{summary_content}"
+    )
 
-#log summary
+# Send message to Telegram and log the response
+telegram_response = send_message(message)
+
+# Write to log file
 with open(log_file, 'a') as log:
-  log.write(f"Backup on: {datetime.now()}\n")
-  log.write(f"telegram_response: {telegram_response}\n")
-  log.write(summary_content + "\n")
+    log.write(message + "\n")
+    log.write(f"Telegram Response: {telegram_response}\n\n")
 
-# Wait a bit to ensure all writes are finished
+# Wait to ensure all writes are finished
 time.sleep(10)
-#get /dev/sdX from UUID
-uuid = "3D44E146065881FD"
+
+# Get /dev/sdX from UUID and put disk to sleep
 device = subprocess.check_output(['blkid', '-U', uuid], text=True).strip()
 subprocess.run(['sudo', 'hdparm', '-y', device])
-
-
