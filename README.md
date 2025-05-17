@@ -5,29 +5,33 @@ Automated rsync backup of HDD. With logs & telegram bot notifications.
 auto_setup_Rsync&telegram_env.py should be used to securely store your Rsync variables & telegram bot details onto your OS environment.
 Either by using script or by setting manual:
 ## Script:
-Download "auto_setup_Rsync&telegram_e"
+Download "auto_setup_Rsync&telegram_env.py"
 Make script executable by running, in terminal:
 
-	chmod +x auto_import_telegram_env.sh
-run script & give bot_token & chat_id of your telegram bot: 
+	chmod +x auto_setup_Rsync&telegram_env.py
+run the following script; give bot_token & chat_id of your telegram bot: 
 
-	./auto_import_telegram_env.sh
+	./auto_setup_Rsync&telegram_env.py
  
   ## Manual:
   use the following to store you sensitive date securely onto the OS. 
   run in terminal:
 		
-	nano ~/.env_telegram
+	nano ~/.env_backup_telegram
   place:
-  
-	export BOT_TOKEN='your_bot_token_here'
+  	
+   	export BOT_TOKEN='your_bot_token_here'
 	export CHAT_ID='your_chat_id_here'
+    	export BACKUP_SOURCE='$BACKUP_SOURCE'
+    	export BACKUP_DESTINATION='$BACKUP_DESTINATION'
+    	export BACKUP_UUID='$BACKUP_UUID'
+    	export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
   ctrl+o (for save) & ctrl-x (for exit)  &  run (in terminal): 
 	
- 	source ~/.env_telegram
+ 	source ~/.env_backup_telegram
   run (in terminal): 
 		
-	chmod 600 ~/.env_telegram
+	chmod 600 ~/.env_backup_telegram
 
 # setup Rsync 
 ## backup_config_nas.json
