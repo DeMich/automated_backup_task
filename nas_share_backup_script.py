@@ -34,6 +34,8 @@ with open(log_file, 'a') as log:
 # Wait a bit to ensure all writes are finished
 time.sleep(10)
 #get /dev/sdX from UUID
-DEVICE=$(blkid -U 3D44E146065881FD)
-sudo hdparm -y "$DEVICE"
+uuid = "3D44E146065881FD"
+device = subprocess.check_output(['blkid', '-U', uuid], text=True).strip()
+subprocess.run(['sudo', 'hdparm', '-y', device])
+
 
