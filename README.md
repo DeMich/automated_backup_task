@@ -1,11 +1,11 @@
 # automated
 Automated rsync backup of HDD. With logs & telegram bot notifications.
 #
-# Telegram bot setup
-Bot_token & chat_id needs to be securely stored in the OS. 
-Either by using script or by setting manual
+# Setup of variables
+auto_setup_Rsync&telegram_env.py should be used to securely store your Rsync variables & telegram bot details onto your OS environment.
+Either by using script or by setting manual:
 ## Script:
-Download "auto_import_telegram_env.sh"
+Download "auto_setup_Rsync&telegram_e"
 Make script executable by running, in terminal:
 
 	chmod +x auto_import_telegram_env.sh
