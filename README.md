@@ -59,8 +59,6 @@ download this script. Place it in /home/"your username"/scripts/ & don't change 
 This script will need to be triggered to automate the task. Preferably by cron:
 
 	crontab -e
- this will open cron
- 
- 	00 5 1 * * /usr/bin/python3 /home/"your username"/scripts/nas_share_backup_script.py
-
 at the bottom, paste this rule. 00=minutes, 5=5AM, 1=first day of the month, *=every month, *=every day of the week
+
+	00 5 1 * * /usr/bin/python3 /home/"your username"/scripts/nas_share_backup_script.py
