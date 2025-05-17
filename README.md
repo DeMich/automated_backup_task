@@ -53,7 +53,7 @@ run the script:
 		
 	chmod 600 ~/.env_backup_telegram
 
-#automate monthly backup
+# automate monthly backup
 ##nas_share_backup_script.py
 download this script. Place it in /home/"your username"/scripts/ & don't change the name
 This script will need to be triggered to automate the task. Preferably by cron:
