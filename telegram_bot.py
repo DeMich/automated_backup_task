@@ -1,11 +1,15 @@
-## Telegram_bot.py
+### Telegram_bot.py
 import os
 import requests
 
-# Telegram settings
+## Telegram settings
+
 bot_token = os.environ.get("BOT_TOKEN")
 chat_id = os.environ.get("CHAT_ID")
 #bot_token&chat_id has been stored on linux mint as sensitive data by using the environment variables
+# use the following to store you sensitive date securely onto the OS. 
+#export BOT_TOKEN='your_bot_token_here'
+#export CHAT_ID='your_chat_id_here'
 
 def send_message(msg):
     url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
