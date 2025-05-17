@@ -1,15 +1,22 @@
 # automated
 Automated rsync backup of HDD. With logs & telegram bot notifications.
-#
-# Setup of variables
-"setup_backup_telegram_variables.sh" should be used to securely store your Rsync variables & telegram bot details onto your OS environment. first do some installations on your OS through terminal:
+## Neccessary installations on OS:
+through terminal:
+(first look if your OS is fully updated)
 
-  	install through terminal:
-  	sudo apt update (first look if your OS is fully updated)
-   	sudo apt upgrade ( implement these updates)
-  	hdparm (this will be used to send the power down command to the backup HDD, after sync)
-	sudo apt install python3 (scripts are in python language)
-  Later on when running the setup script, you will need to give the following variabels when during the script:
+  	sudo apt update 
+(implement these updates)
+
+	sudo apt upgrade
+(this will be used to send the power down command to the backup HDD, after sync)
+
+  	sudo apt install hdparm 
+scripts are in python language
+
+ 	sudo apt install python3 
+# Setup of variables
+"setup_backup_telegram_variables.sh" should be used to securely store your Rsync variables & telegram bot details onto your OS environment. OR manually
+## when running the setup script, you will need to give the following variables during the script:
 
  	source path (HDD you want to backup)
  	destination path (HDD that will be your backup)
