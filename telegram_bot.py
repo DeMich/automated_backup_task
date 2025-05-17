@@ -3,8 +3,8 @@ import os
 import requests
 
 # Telegram settings
-bot_token = os.environ.get(bot_token)
-chat_id = os.environ.get(chat_id)
+bot_token = os.environ.get("BOT_TOKEN")
+chat_id = os.environ.get("CHAT_ID")
 #bot_token&chat_id has been stored on linux mint as sensitive data by using the environment variables
 
 def send_message(msg):
