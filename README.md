@@ -2,16 +2,31 @@
 Automated rsync backup of HDD. With logs & telegram bot notifications.
 #
 # Setup of variables
-auto_setup_Rsync&telegram_env.py should be used to securely store your Rsync variables & telegram bot details onto your OS environment.
+"setup_backup_telegram_variables.sh" should be used to securely store your Rsync variables & telegram bot details onto your OS environment. You will need to give the following variabels when running script & afterwards install on OS:
+
+	give in script:
+	source path (HDD you want to backup)
+ 	destination path (HDD that will be your backup)
+	log file path
+	backup HDD UUID (use blkid to look this up, when drive is mounted)
+	telegram bot_token
+ 	telegram chat_id
+
+ 	install through terminal:
+  	sudo apt update (first look if your OS is fully updated)
+   	sudo apt upgrade ( implement these updates)
+  	hdparm (this will be used to send the power down command to the backup HDD, after sync)
+	sudo apt install python3 (scripts are in python language)
+     
 Either by using script or by setting manual:
 ## Script:
-Download "auto_setup_Rsync&telegram_env.py"
+Download "setup_backup_telegram_variables.sh"
 Make script executable by running, in terminal:
 
-	chmod +x auto_setup_Rsync&telegram_env.py
-run the following script; give bot_token & chat_id of your telegram bot: 
+	chmod +x setup_backup_telegram_variables.sh
+run the script: 
 
-	./auto_setup_Rsync&telegram_env.py
+	./setup_backup_telegram_variables.sh
  
   ## Manual:
   use the following to store you sensitive date securely onto the OS. 
@@ -29,23 +44,18 @@ run the following script; give bot_token & chat_id of your telegram bot:
   ctrl+o (for save) & ctrl-x (for exit)  &  run (in terminal): 
 	
  	source ~/.env_backup_telegram
-  run (in terminal): 
+  make file only accesable to you by command (in terminal): 
 		
 	chmod 600 ~/.env_backup_telegram
 
-# setup Rsync 
-## backup_config_nas.json
-source path, destination path, backup file location path & backup HHD UUID needs to be placed correctly inside this json file.
-###
-backup HDD UUID will be used to send spin down ( AKA power down) command.
-###
-install hdparm for command
-### 
-	need guide for instalment
-
+#automate monthly backup
 ##nas_share_backup_script.py
+download this script. Place it in /home/"your username"/scripts/ & don't change the name
 This script will need to be triggered to automate the task. Preferably by cron:
 
 	crontab -e
- 	## 1 1 * * ...
-this script will use telegram_bot.py for notifications
+ this will open cron
+ 
+ 	00 5 1 * * /usr/bin/python3 /home/username/scripts/nas_share_backup_script.py
+
+at the bottom, paste this rule. 00=minutes, 5=5AM, 1=first day of the month, *=every month, *=every day of the week
