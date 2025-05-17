@@ -4,14 +4,12 @@ from telegram_bot import send_message
 import time
 import json
 
-# Load configuration from JSON file
-with open('backup_config_nas.json', 'r') as config_file:
-    config = json.load(config_file)
+# Load backup configuration from environment variables
+source = os.environ.get("BACKUP_SOURCE")
+destination = os.environ.get("BACKUP_DESTINATION")
+uuid = os.environ.get("BACKUP_UUID")
+log_file = os.environ.get("BACKUP_LOG_FILE")
 
-source = config['source']
-destination = config['destination']
-uuid = config['uuid']
-log_file = config['log_file']
 
 # Rsync command
 rsync_command = ['rsync', '-a', '--stats', '--human-readable', source, destination]
