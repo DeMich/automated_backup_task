@@ -26,8 +26,7 @@ scripts are in python language
  	telegram chat_id
 Either by using script or by setting manual:
 ## Script:
-Download "setup_backup_telegram_variables.sh"
-Make script executable by running, in terminal:
+Download "setup_backup_telegram_variables.sh" & make script executable by running, in terminal:
 
 	chmod +x setup_backup_telegram_variables.sh
 run the script: 
