@@ -29,4 +29,19 @@ run script & give bot_token & chat_id of your telegram bot:
 		
 	chmod 600 ~/.env_telegram
 
-#
+# setup Rsync 
+## backup_config_nas.json
+source path, destination path, backup file location path & backup HHD UUID needs to be placed correctly inside this json file.
+###
+backup HDD UUID will be used to send spin down ( AKA power down) command.
+###
+install hdparm for command
+### 
+	need guide for instalment
+
+##nas_share_backup_script.py
+This script will need to be triggered to automate the task. Preferably by cron:
+
+	crontab -e
+ 	## 1 1 * * ...
+this script will use telegram_bot.py for notifications
