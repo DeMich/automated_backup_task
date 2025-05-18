@@ -15,7 +15,7 @@ Make sure you have the following information ready:
 
 - **HDD mount point** – the source directory you want to back up (e.g., `/mnt/data`)
 - **HDD backup mount point** – the destination directory where the backup will be stored (e.g., `/mnt/data_backup`)
-- **HDD backup UUID** – the UUID of the backup drive (you can find it using `blkid`)
+- **HDD backup UUID** – used for powering down the backup drive (you can find it using `blkid`)
 
 If you want Telegram automated messages. Also have the following information ready:
 - **Telegram bot token**
