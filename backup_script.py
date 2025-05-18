@@ -5,23 +5,6 @@ from telegram_bot import send_message
 import time
 import json
 
-# If auto setup for configuration of variables wasn't used. Manually is also possible:
-# use the following to store you sensitive date securely onto the OS. 
-  # run in terminal: "nano /home/"your username"/automated/.env_backup_telegram_variables"
-  # place:
-    # if using Telegram bot additionally:
-      # export BOT_TOKEN='your_bot_token_here'
-      # export CHAT_ID='your_chat_id_here'
-    # defenitely do the followng:
-      # export BACKUP_SOURCE='$BACKUP_SOURCE'
-      # export BACKUP_DESTINATION='$BACKUP_DESTINATION'
-      # export BACKUP_UUID='$BACKUP_UUID'
-      # export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
-  # ctrl+o (for save) & ctrl-x (for exit)
-  # run (in terminal): "source /home/"your username"/automated/.env_backup_telegram_variables"
-  # run (in terminal): "chmod 600 /home/"your username"/automated/.env_backup_telegram_variables"
-
-
 # Load backup configuration from environment variables
 source = os.environ.get("BACKUP_SOURCE")
 destination = os.environ.get("BACKUP_DESTINATION")
