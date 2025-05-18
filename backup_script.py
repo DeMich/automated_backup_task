@@ -7,17 +7,19 @@ import json
 
 # If auto setup for configuration of variables wasn't used. Manually is also possible:
 # use the following to store you sensitive date securely onto the OS. 
-  # run in terminal: "nano ~/.env_backup_automated"
+  # run in terminal: "nano /home/"your username"/automated/.env_backup_telegram_variables"
   # place:
-    # export BOT_TOKEN='your_bot_token_here'
-    # export CHAT_ID='your_chat_id_here'
-    # export BACKUP_SOURCE='$BACKUP_SOURCE'
-    # export BACKUP_DESTINATION='$BACKUP_DESTINATION'
-    # export BACKUP_UUID='$BACKUP_UUID'
-    # export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
+    # if using Telegram bot additionally:
+      # export BOT_TOKEN='your_bot_token_here'
+      # export CHAT_ID='your_chat_id_here'
+    # defenitely do the followng:
+      # export BACKUP_SOURCE='$BACKUP_SOURCE'
+      # export BACKUP_DESTINATION='$BACKUP_DESTINATION'
+      # export BACKUP_UUID='$BACKUP_UUID'
+      # export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
   # ctrl+o (for save) & ctrl-x (for exit)
-  # run (in terminal): "source ~/.env_backup_automated"
-  # run (in terminal): "chmod 600 ~/.env_backup_automated"
+  # run (in terminal): "source /home/"your username"/automated/.env_backup_telegram_variables"
+  # run (in terminal): "chmod 600 /home/"your username"/automated/.env_backup_telegram_variables"
 
 
 # Load backup configuration from environment variables
@@ -35,6 +37,16 @@ process = subprocess.run(rsync_command, capture_output=True, text=True)
 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 summary_content = process.stdout + process.stderr
 
+# Try to put the disk to sleep and capture the result
+try:
+    device = subprocess.check_output(['blkid', '-U', uuid], text=True).strip()
+    subprocess.run(['sudo', 'hdparm', '-y', device], check=True)
+    disk_sleep_status = f"✅ Disk {device} put to sleep successfully."
+except subprocess.CalledProcessError as e:
+    disk_sleep_status = f"⚠️ Failed to resolve UUID or put disk to sleep: {e}"
+except Exception as e:
+    disk_sleep_status = f"❌ Unexpected error while handling disk sleep: {e}"
+
 if process.returncode:
     status = "FAILURE"
     message = (
@@ -42,7 +54,8 @@ if process.returncode:
         f"Source: {source}\n"
         f"Destination: {destination}\n"
         f"Error Code: {process.returncode}\n"
-        f"Details:\n{summary_content}"
+        f"Details:\n{summary_content}\n\n"
+        f"{disk_sleep_status}"
     )
 else:
     status = "SUCCESS"
@@ -50,11 +63,15 @@ else:
         f"[{timestamp}] BACKUP STATUS: {status}\n"
         f"Source: {source}\n"
         f"Destination: {destination}\n"
-        f"Details:\n{summary_content}"
+        f"Details:\n{summary_content}\n\n"
+        f"{disk_sleep_status}"
     )
 
-# Send message to Telegram and log the response
-telegram_response = send_message(message)
+# Send message to Telegram if credentials are available
+if os.environ.get("BOT_TOKEN") and os.environ.get("CHAT_ID"):
+    telegram_response = send_message(message)
+else:
+    telegram_response = "Telegram not configured."
 
 # Write to log file
 with open(log_file, 'a') as log:
