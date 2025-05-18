@@ -3,6 +3,10 @@
 
 # Get the current username
 USERNAME=$(whoami)
+# make folder for all backup related stuff, make log file & env file where variables will be stored securely
+mkdir -p "/home/$USERNAME/automated_backup_task"
+BACKUP_LOG_FILE="/home/$USERNAME/automated_backup_task/backup.log"
+ENV_FILE="/home/$USERNAME/automated_backup_task/.env_backup_telegram_variables"
 
 # Step 1: Install git if not already installed
 if ! command -v git &> /dev/null; then
@@ -23,28 +27,30 @@ else
     echo "📥 Cloning repository into $TARGET_DIR..."
     git clone "$REPO_URL" "$TARGET_DIR"
 fi
-
 echo "✅ GitHub repository synced to $TARGET_DIR."
 
 # Step 3: Prompt user for Telegram and backup configuration
-ENV_FILE="/home/$USERNAME/automated_backup_task/.env_backup_telegram_variables"
+read -p "Do you want to configure Telegram notifications? (y/n): " CONFIGURE_TELEGRAM
 
-read -p 'Enter your BOT_TOKEN: ' BOT_TOKEN
-read -p 'Enter your CHAT_ID: ' CHAT_ID
+if [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]]; then
+    read -p 'Enter your BOT_TOKEN: ' BOT_TOKEN
+    read -p 'Enter your CHAT_ID: ' CHAT_ID
+fi
 read -p 'Enter your backup SOURCE path (e.g., //share/): ' BACKUP_SOURCE
 read -p 'Enter your backup DESTINATION path (e.g., //share_backup/): ' BACKUP_DESTINATION
 read -p 'Enter your backup UUID (e.g., 3D44E146065881FD): ' BACKUP_UUID
-read -p 'Enter your LOG FILE path (e.g., /home/youruser/backup/share_backup.log): ' BACKUP_LOG_FILE
-# Step 4: Write environment variables to file
-mkdir -p "/home/$USERNAME/automated_backup_task"
-cat <<EOF > "$ENV_FILE"
-export BOT_TOKEN='$BOT_TOKEN'
-export CHAT_ID='$CHAT_ID'
-export BACKUP_SOURCE='$BACKUP_SOURCE'
-export BACKUP_DESTINATION='$BACKUP_DESTINATION'
-export BACKUP_UUID='$BACKUP_UUID'
-export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
-EOF
+
+
+# Step 5: Write environment variables to file
+{
+    [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]] && echo "export BOT_TOKEN='$BOT_TOKEN'"
+    [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]] && echo "export CHAT_ID='$CHAT_ID'"
+    echo "export BACKUP_SOURCE='$BACKUP_SOURCE'"
+    echo "export BACKUP_DESTINATION='$BACKUP_DESTINATION'"
+    echo "export BACKUP_UUID='$BACKUP_UUID'"
+    echo "export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'"
+} > "$ENV_FILE"
+
 
 # Step 5: Secure the environment file
 chmod 600 "$ENV_FILE"
