@@ -68,7 +68,7 @@ if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
     echo "📌 Copy the following line if you want to manually add or inspect it:"
     echo "    $CRON_JOB"
     echo "✏️ To manually edit your cron jobs, run:"
-    echo "    crontab -e
+    echo "    crontab -e"
 
 else
     (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
