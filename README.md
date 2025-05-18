@@ -9,12 +9,16 @@ This project sets up an automated backup task using bash and Python scripts. It 
 - Secure storage of environment variables
 - Cron job setup for periodic backups
 
-## Prerequisites
-have te following information ready:
- - HDD mount point
- - HDD backup mount point
- - HDD backup UUID
-The installer will put everything in a new folder called "automated_backup_task" in your home folder
+## Before You Begin
+
+Make sure you have the following information ready:
+
+- **HDD mount point** – the source directory you want to back up (e.g., `/mnt/data`)
+- **HDD backup mount point** – the destination directory where backups will be stored (e.g., `/mnt/backup`)
+- **HDD backup UUID** – the UUID of the backup drive (you can find it using `blkid`)
+
+The installer will create a new folder called `automated_backup_task` in your home directory to store all related scripts, logs, and configuration files.
+
 
 ## Installation
  Run the setup script:  
