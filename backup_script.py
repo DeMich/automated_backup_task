@@ -77,10 +77,3 @@ else:
 with open(log_file, 'a') as log:
     log.write(message + "\n")
     log.write(f"Telegram Response: {telegram_response}\n\n")
-
-# Wait to ensure all writes are finished
-time.sleep(10)
-
-# Get /dev/sdX from UUID and put disk to sleep
-device = subprocess.check_output(['blkid', '-U', uuid], text=True).strip()
-subprocess.run(['sudo', 'hdparm', '-y', device])
