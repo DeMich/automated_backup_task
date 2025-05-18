@@ -65,8 +65,11 @@ CRONTAB_CONTENT=$(crontab -l 2>/dev/null)
 
 if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
     echo "ℹ️ Cron job already exists. No new entry was added."
-    echo " copy the following line & manually perform this last part. The rest has been set:"
-    echo " inspect & add $CRON_JOB manually by running 'crontab -e' in terminal
+    echo "📌 Copy the following line if you want to manually add or inspect it:"
+    echo "    $CRON_JOB"
+    echo "✏️ To manually edit your cron jobs, run:"
+    echo "    crontab -e
+
 else
     (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
     echo "✅ Cron job added:"
