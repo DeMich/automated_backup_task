@@ -10,16 +10,14 @@ This project sets up an automated backup task using bash and Python scripts. It 
 - Cron job setup for periodic backups
 
 ## Prerequisites
-- Git
-- Python 3
-- rsync
-- Telegram bot (optional)
+have te following information ready:
+ - HDD mount point
+ - HDD backup mount point
+ - HDD backup UUID
+The installer will put everything in a new folder called "automated_backup_task" in your home folder
 
 ## Installation
-1. Clone the repository:  
-   `git clone https://github.com/DeMich/automated.git`
-
-2. Run the setup script:  
+ Run the setup script:  
    `bash setup_backup_telegram_variables.sh`
 
 ## Configuration
