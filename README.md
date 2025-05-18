@@ -17,6 +17,10 @@ Make sure you have the following information ready:
 - **HDD backup mount point** – the destination directory where backups will be stored (e.g., `/mnt/backup`)
 - **HDD backup UUID** – the UUID of the backup drive (you can find it using `blkid`)
 
+If you want Telegram automated messages. Also have the following information ready:
+- **Telegram bot token**
+- **telegram chat id**
+
 ## Installation
  Run the setup script:  
    `bash setup_backup_telegram_variables.sh`
