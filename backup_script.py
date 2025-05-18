@@ -54,8 +54,8 @@ if process.returncode:
         f"Source: {source}\n"
         f"Destination: {destination}\n"
         f"Error Code: {process.returncode}\n"
-        f"Details:\n{summary_content}\n\n"
-        f"{disk_sleep_status}"
+        f"Details:\n{summary_content}\n"
+        f"Backup HDD send in sleep mode: {disk_sleep_status}\n\n"
     )
 else:
     status = "SUCCESS"
@@ -63,8 +63,8 @@ else:
         f"[{timestamp}] BACKUP STATUS: {status}\n"
         f"Source: {source}\n"
         f"Destination: {destination}\n"
-        f"Details:\n{summary_content}\n\n"
-        f"{disk_sleep_status}"
+        f"Details:\n{summary_content}\n"
+        f"Backup HDD send in sleep mode: {disk_sleep_status}\n\n"
     )
 
 # Send message to Telegram if credentials are available
