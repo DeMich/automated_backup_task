@@ -27,21 +27,6 @@ If you want Telegram automated messages. Also have the following information rea
 
   The installer will create a new folder called `automated_backup_task` in your home directory to store all related scripts, logs, and configuration files.
 
- If you want to manually set it up:
- - run in terminal: "nano /home/"your username"/automated/.env_backup_telegram_variables"
- - place:
-    - if using Telegram bot additionally:
-      - export BOT_TOKEN='your_bot_token_here'
-      - export CHAT_ID='your_chat_id_here'
-    - defenitely do the followng:
-      - export BACKUP_SOURCE='$BACKUP_SOURCE'
-      - export BACKUP_DESTINATION='$BACKUP_DESTINATION'
-      - export BACKUP_UUID='$BACKUP_UUID'
-      - export BACKUP_LOG_FILE='$BACKUP_LOG_FILE'
- - ctrl+o (for save) & ctrl-x (for exit)
- - run (in terminal): "source /home/"your username"/automated/.env_backup_telegram_variables"
- - run (in terminal): "chmod 600 /home/"your username"/automated/.env_backup_telegram_variables"
-
 ## Configuration
 During the setup, you will be prompted to enter the following information:
 - Telegram BOT_TOKEN (optional)
