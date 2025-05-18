@@ -44,7 +44,7 @@ Once configured, the backup script will run automatically according to the cron 
 You can also run the backup script manually:
 
 ```bash
-python3 /home/"YOUR USERNAME"/automated_backup_task/backup_script.py
+python3 /home/`YOUR USERNAME`/automated_backup_task/backup_script.py
 ```
 
 ## Cron Job Setup
