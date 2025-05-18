@@ -17,12 +17,11 @@ Make sure you have the following information ready:
 - **HDD backup mount point** – the destination directory where backups will be stored (e.g., `/mnt/backup`)
 - **HDD backup UUID** – the UUID of the backup drive (you can find it using `blkid`)
 
-The installer will create a new folder called `automated_backup_task` in your home directory to store all related scripts, logs, and configuration files.
-
-
 ## Installation
  Run the setup script:  
    `bash setup_backup_telegram_variables.sh`
+
+ The installer will create a new folder called `automated_backup_task` in your home directory to store all related scripts, logs, and configuration files.
 
 ## Configuration
 During the setup, you will be prompted to enter the following information:
