@@ -1,4 +1,4 @@
-# Automated Backup Task with Telegram Notifications
+# Automated Backup Task with optional Telegram Notifications
 
 ## Project Overview
 This project sets up an automated backup task using bash and Python scripts. It includes optional Telegram notifications to keep you informed about the backup status.
