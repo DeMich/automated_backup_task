@@ -52,16 +52,25 @@ read -p 'Enter your backup UUID (e.g., 3D44E146065881FD): ' BACKUP_UUID
 } > "$ENV_FILE"
 
 
-# Step 5: Secure the environment file
+# Step 6: Secure the environment file
 chmod 600 "$ENV_FILE"
 source "$ENV_FILE"
 
 echo "✅ Environment variables saved to $ENV_FILE and sourced."
 
-# Step 6: Add cron job
-CRON_JOB="00 5 1 * * /usr/bin/python3 /home/$USERNAME/automated_backup_task/backup_script.py"
-(crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
 
-echo "✅ Cron job added:"
-echo "$CRON_JOB"
-echo "🕔 This cron job runs at 5:00 AM on the 1st day of every month."
+# Step 7: Add cron job if not already present
+CRON_JOB="00 5 1 * * /usr/bin/python3 /home/$USERNAME/automated_backup_task/backup_script.py"
+CRONTAB_CONTENT=$(crontab -l 2>/dev/null)
+
+if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
+    echo "ℹ️ Cron job already exists. No new entry was added."
+    echo "🔍 To manually inspect & alter your cron jobs, run the following command in your terminal:"
+    echo "    crontab -e"
+else
+    (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
+    echo "✅ Cron job added:"
+    echo "$CRON_JOB"
+    echo "🕔 This cron job runs at 5:00 AM on the 1st day of every month."
+fi
+
