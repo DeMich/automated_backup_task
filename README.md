@@ -25,7 +25,7 @@ If you want Telegram automated messages. Also have the following information rea
  Run the setup script:
  - with terminal, go to the folder, where "setup_backup_telegram_variables.sh" is located
  - make it executable: `chmod +x setup_backup_telegram_variables.sh`
- - run the script: `./bash setup_backup_telegram_variables.sh`
+ - run the script: `bash ./setup_backup_telegram_variables.sh`
 
   The installer will create a new folder called `automated_backup_task` in your home directory to store all related scripts, logs, and configuration files. It will use git to get all necessary scripts. After prompting for the variables, it'll make the automated task with cron
 
