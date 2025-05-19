@@ -9,13 +9,12 @@ import time
 import json
 from dotenv import load_dotenv
 
-
 # Load backup configuration from environment variables
 source = os.environ.get("BACKUP_SOURCE")
 destination = os.environ.get("BACKUP_DESTINATION")
 uuid = os.environ.get("BACKUP_UUID")
 log_file = os.environ.get("BACKUP_LOG_FILE")
-load_dotenv('~/automated_backup_task/.env_backup_telegram_variables')
+load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_variables'))
 
 
 # Rsync command
