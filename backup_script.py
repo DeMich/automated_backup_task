@@ -1,6 +1,9 @@
 import os
 import subprocess
 from datetime import datetime
+# Add the script directory to the Python path
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, script_dir)
 from telegram_bot import send_message
 import time
 import json
