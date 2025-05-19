@@ -16,6 +16,16 @@ else
     echo "✅ Git is already installed."
 fi
 
+# Step 1b: Install python-dotenv (and pip if needed)
+if ! python3 -c "import dotenv" &> /dev/null; then
+    echo "🔧 python-dotenv not found. Installing python3-pip and python-dotenv..."
+    sudo apt update
+    sudo apt install -y python3-pip
+    pip3 install --user python-dotenv
+else
+    echo "✅ python-dotenv is already installed."
+fi
+
 # Step 2: Clone or sync the GitHub repository
 TARGET_DIR="/home/$USERNAME/automated_backup_task/scripts"
 REPO_URL="https://github.com/DeMich/automated"
