@@ -8,7 +8,9 @@ load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_var
 ## Telegram settings
 
 bot_token = os.environ.get("BOT_TOKEN")
+echo bot_token
 chat_id = os.environ.get("CHAT_ID")
+echo chat_id
 
 def send_message(msg):
     url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
