@@ -1,6 +1,9 @@
 ### Telegram_bot.py
 import os
 import requests
+import json
+from dotenv import load_dotenv
+load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_variables'))
 
 ## Telegram settings
 
