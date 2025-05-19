@@ -20,8 +20,7 @@ fi
 if ! python3 -c "import dotenv" &> /dev/null; then
     echo "🔧 python-dotenv not found. Installing python3-pip and python-dotenv..."
     sudo apt update
-    sudo apt install -y python3-pip
-    pip3 install --user python-dotenv
+    sudo apt install python3-dotenv
 else
     echo "✅ python-dotenv is already installed."
 fi
