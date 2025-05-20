@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 
 # Load backup configuration from environment variables
 source = os.environ.get("BACKUP_SOURCE")
+if source and not source.endswith('/'):
+    source += '/'
 destination = os.environ.get("BACKUP_DESTINATION")
 uuid = os.environ.get("BACKUP_UUID")
 log_file = os.environ.get("BACKUP_LOG_FILE")
