@@ -21,7 +21,7 @@ load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_var
 
 
 # Rsync command
-rsync_command = ['rsync', '-a', '--stats', '--human-readable', source, destination]
+rsync_command = ['rsync', '-a', '--exclude=lost+found/', '--stats', '--human-readable', source, destination]
 process = subprocess.run(rsync_command, capture_output=True, text=True)
 
 # Prepare log message
