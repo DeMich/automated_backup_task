@@ -64,7 +64,7 @@ chmod 600 "$ENV_FILE"
 echo "✅ Python-compatible environment variables saved to $ENV_FILE."
 
 # Step 7: Add cron job if not already present
-CRON_JOB="00 5 1 * * /usr/bin/python3 /home/$USERNAME/automated_backup_task/backup_script.py"
+CRON_JOB="00 5 1 * * /usr/bin/python3 /home/$USERNAME/automated_backup_task/scripts/backup_script.py"
 CRONTAB_CONTENT=$(crontab -l 2>/dev/null)
 
 if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
