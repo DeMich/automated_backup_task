@@ -1,14 +1,15 @@
 #!/bin/bash
+set -euo pipefail
 
-# ANSI color codes for display visualization of install progress
+# === ANSI color codes for progress visualization ===
 GRAY='\033[90m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-# Define installation steps
-steps=("Intro" "Create folders" "Install packages" "Clone repo" "Telegram notifications" "Write .env" "Secure .env" "Add cron job" "Test backup")
+# === Installation steps ===
+steps=("Intro" "Create folders" "Install packages" "Clone repo" "Telegram notifications" "Drive selection" "Write .env" "Secure .env" "Add cron job" "Test backup")
 
-# Function to display progress
+# === Progress display function ===
 show_progress() {
     local current_step=$1
     echo ""
@@ -25,141 +26,165 @@ show_progress() {
     echo ""
 }
 
-# Step 0: Intro
+# === Logging ===
+BACKUP_BASE="$HOME/automated_backup_task"
+mkdir -p "$BACKUP_BASE"
+BACKUP_LOG_FILE="$BACKUP_BASE/backup.log"
+ENV_FILE="$BACKUP_BASE/.env_backup_telegram_variables"
+exec > >(tee -a "$BACKUP_LOG_FILE") 2>&1
+
+# === Step 0: Intro ===
 show_progress 0
 echo "🔧 Welcome to the Automated Backup Task Installer"
 echo "--------------------------------------------------"
 echo "This script will:"
-echo "  - Create a folder in your home directory for necessary scripts, logs & a protected .env file with your own settings"
-echo "  - Prompt you to choose which HDDs to use & optionally configure Telegram notifications"
-echo "  - Install required packages (git, Python, pip, python-dotenv)"
-echo "  - Clone or update the backup script repository"
-echo "  - Set up a cron job to run the backup monthly"
-echo "  - Optionally test the backup script after setup"
+echo "  - Create a folder for scripts, logs & settings"
+echo "  - Install required packages (git, python3, pip, python-dotenv)"
+echo "  - Clone/update the backup script repo"
+echo "  - Prompt for drives and Telegram setup"
+echo "  - Write a secured .env file with your settings"
+echo "  - Add a cron job to run backups monthly"
+echo "  - Optionally run a test backup"
 echo ""
 read -p "❓ Do you want to proceed with the installation? (y/n): " proceed
-
 if [[ ! "$proceed" =~ ^[Yy]$ ]]; then
-    echo "❌ Installation aborted by user."
+    echo "❌ Installation aborted."
     exit 0
 fi
-
 echo "✅ Proceeding with installation..."
 
-# Step 1: Create folders
+# === Step 1: Create folders ===
 show_progress 1
-mkdir -p "$HOME/automated_backup_task"
-echo "📁 Created folder 'automated_backup_task' in your home directory."
-
-BACKUP_LOG_FILE="$HOME/automated_backup_task/backup.log"
-ENV_FILE="$HOME/automated_backup_task/.env_backup_telegram_variables"
+mkdir -p "$BACKUP_BASE/scripts"
 touch "$BACKUP_LOG_FILE" "$ENV_FILE"
-echo "📝 Created log file and .env file."
+echo "📁 Backup folder and files prepared at $BACKUP_BASE."
 
-# Step 2: Install required packages
+# === Step 2: Install required packages ===
 show_progress 2
-if ! command -v git &> /dev/null; then
-    echo "🔧 Git not found. Installing git..."
-    sudo apt update && sudo apt install -y git
+if ! command -v python3 &>/dev/null; then
+    echo "🔧 Installing Python3..."
+    sudo apt update && sudo apt install -y python3
 else
-    echo "✅ Git is already installed."
+    echo "✅ Python3 is already installed."
 fi
 
-if ! python3 -c "import dotenv" &> /dev/null; then
-    echo "🔧 python-dotenv not found. Installing pip and python-dotenv..."
+if ! command -v pip3 &>/dev/null; then
+    echo "🔧 Installing pip3..."
     sudo apt install -y python3-pip
-    pip3 install python-dotenv
+else
+    echo "✅ pip3 is already installed."
+fi
+
+if ! python3 -c "import dotenv" &>/dev/null; then
+    echo "🔧 Installing python-dotenv..."
+    pip3 install --user python-dotenv
 else
     echo "✅ python-dotenv is already installed."
 fi
 
-# Step 3: Clone or update repo
-show_progress 3
-TARGET_DIR="$HOME/automated_backup_task/scripts"
-REPO_URL="https://github.com/DeMich/automated"
+if ! command -v git &>/dev/null; then
+    echo "🔧 Installing Git..."
+    sudo apt install -y git
+else
+    echo "✅ Git is already installed."
+fi
 
+# === Step 3: Clone or update repo ===
+show_progress 3
+TARGET_DIR="$BACKUP_BASE/scripts"
+REPO_URL="https://github.com/DeMich/automated"
 if [ -d "$TARGET_DIR/.git" ]; then
-    echo "🔄 Repository already exists. Pulling latest changes..."
+    echo "🔄 Updating existing repository..."
     git -C "$TARGET_DIR" pull
 else
-    echo "📥 Cloning repository into $TARGET_DIR..."
+    echo "📥 Cloning repository..."
     git clone "$REPO_URL" "$TARGET_DIR"
 fi
-echo "✅ GitHub repository synced to $TARGET_DIR."
+echo "✅ Repository ready at $TARGET_DIR."
 
-# Step 4: Telegram setup
+# === Step 4: Telegram setup ===
 show_progress 4
-echo "📨 Telegram Notification Setup"
-echo "You can set up a Telegram Bot to receive automated notifications about your backup tasks."
-echo "This is optional and can be skipped."
-
-read -p "Do you want to configure Telegram notifications? (y/n): " CONFIGURE_TELEGRAM
-
+echo "📨 Optional Telegram Bot setup"
+read -p "Do you want Telegram notifications? (y/n): " CONFIGURE_TELEGRAM
+BOT_TOKEN=""
+CHAT_ID=""
 if [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]]; then
-    echo "🔧 Please set up a Telegram Bot and obtain your bot token and chat ID."
-    read -p 'Enter your BOT_TOKEN: ' BOT_TOKEN
-    read -p 'Enter your CHAT_ID: ' CHAT_ID
+    echo "🔧 Enter Telegram Bot credentials:"
+    read -p "BOT_TOKEN: " BOT_TOKEN
+    read -p "CHAT_ID : " CHAT_ID
 fi
 
-# Step 5: Drive selection
+# === Step 5: Drive selection ===
 show_progress 5
-echo "🔍 Detecting available drives..."
-
-mapfile -t drives < <(lsblk -o UUID,MOUNTPOINT,SIZE,MODEL | grep -v "^\s*$" | grep -v "UUID")
+echo "🔍 Detecting drives..."
+mapfile -t drives < <(lsblk -o UUID,MOUNTPOINT,SIZE,MODEL -P | grep 'MOUNTPOINT=')
 
 if [ ${#drives[@]} -eq 0 ]; then
-    echo "❌ No mounted drives found. Please check your system."
+    echo "❌ No mounted drives found!"
     exit 1
 fi
 
 echo "📦 Available Drives:"
 for i in "${!drives[@]}"; do
-    echo "  [$i] ${drives[$i]}"
+    eval "${drives[$i]}"
+    echo "  [$i] UUID=$UUID MOUNTPOINT=$MOUNTPOINT SIZE=$SIZE MODEL=$MODEL"
 done
 
-read -p "📁 Select the number of the SOURCE drive to back up: " source_index
-SOURCE_INFO="${drives[$source_index]}"
-BACKUP_SOURCE=$(echo "$SOURCE_INFO" | awk '{print $2}')
-BACKUP_UUID=$(echo "$SOURCE_INFO" | awk '{print $1}')
+read -p "📁 Select the number of the SOURCE drive: " source_index
+eval "${drives[$source_index]}"
+BACKUP_SOURCE="$MOUNTPOINT"
+BACKUP_UUID="$UUID"
 
-read -p "💾 Select the number of the DESTINATION drive for backup: " dest_index
-DEST_INFO="${drives[$dest_index]}"
-BACKUP_DESTINATION=$(echo "$DEST_INFO" | awk '{print $2}')
-DEST_UUID=$(echo "$DEST_INFO" | awk '{print $1}')
+read -p "💾 Select the number of the DESTINATION drive: " dest_index
+eval "${drives[$dest_index]}"
+BACKUP_DESTINATION="$MOUNTPOINT"
+DEST_UUID="$UUID"
 
-echo "✅ Selected SOURCE: $BACKUP_SOURCE (UUID: $BACKUP_UUID)"
-echo "✅ Selected DESTINATION: $BACKUP_DESTINATION (UUID: $DEST_UUID)"
+if [[ "$BACKUP_SOURCE" == "$BACKUP_DESTINATION" ]]; then
+    echo "❌ Source and destination cannot be the same!"
+    exit 1
+fi
 
-# Step 6: Write .env file
+echo "✅ SOURCE: $BACKUP_SOURCE (UUID: $BACKUP_UUID)"
+echo "✅ DEST  : $BACKUP_DESTINATION (UUID: $DEST_UUID)"
+
+# === Step 6: Write .env file ===
 show_progress 6
 {
-    [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]] && echo "BOT_TOKEN=$BOT_TOKEN"
-    [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]] && echo "CHAT_ID=$CHAT_ID"
+    [[ -n "$BOT_TOKEN" ]] && echo "BOT_TOKEN=$BOT_TOKEN"
+    [[ -n "$CHAT_ID" ]] && echo "CHAT_ID=$CHAT_ID"
     echo "BACKUP_SOURCE=$BACKUP_SOURCE"
     echo "BACKUP_DESTINATION=$BACKUP_DESTINATION"
     echo "BACKUP_UUID=$BACKUP_UUID"
     echo "BACKUP_LOG_FILE=$BACKUP_LOG_FILE"
 } > "$ENV_FILE"
+echo "📝 Environment settings saved to $ENV_FILE."
 
-# Step 7: Secure .env file
+# === Step 7: Secure .env ===
 show_progress 7
 chmod 600 "$ENV_FILE"
-echo "🔒 Environment file secured at $ENV_FILE."
+echo "🔒 Protected environment file."
 
-# Step 8: Add cron job
+# === Step 8: Add cron job ===
 show_progress 8
-CRON_JOB="00 5 1 * * /usr/bin/python3 $HOME/automated_backup_task/scripts/backup_script.py"
-CRONTAB_CONTENT=$(crontab -l 2>/dev/null)
+CRON_JOB="0 5 1 * * /usr/bin/python3 $TARGET_DIR/backup_script.py"
+CRONTAB_CONTENT=$(crontab -l 2>/dev/null || true)
 
 if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
-    echo "ℹ️ Cron job already exists. No new entry was added."
-    echo "📌 Copy the following line if you want to manually add or inspect it:"
-    echo "    $CRON_JOB"
-    echo "✏️ To manually edit your cron jobs, run:"
-    echo "    crontab -e"
+    echo "ℹ️ Cron job already exists."
 else
     (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
-    echo "✅ Cron job added:"
-    echo "$CRON_JOB"
-    echo "🕔 This cron job runs at 5:00 AM on the 1st day of every month."
+    echo "✅ Cron job added (@ monthly, 5:00 AM, 1st)."
 fi
+
+# === Step 9: Optional test backup ===
+show_progress 9
+read -p "🧪 Run a test backup now? (y/n): " test_backup
+if [[ "$test_backup" =~ ^[Yy]$ ]]; then
+    python3 "$TARGET_DIR/backup_script.py"
+    echo "✅ Test backup complete. Logs: $BACKUP_LOG_FILE"
+else
+    echo "ℹ️ Skipped test backup."
+fi
+
+echo "🎉 Installation finished successfully!"
