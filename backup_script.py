@@ -11,14 +11,13 @@ import json
 from dotenv import load_dotenv
 
 # Load backup configuration from environment variables
+load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_variables'))
 source = os.environ.get("BACKUP_SOURCE")
 if source and not source.endswith('/'):
     source += '/'
 destination = os.environ.get("BACKUP_DESTINATION")
 uuid = os.environ.get("BACKUP_UUID")
 log_file = os.environ.get("BACKUP_LOG_FILE")
-load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_variables'))
-
 
 # Rsync command
 rsync_command = ['rsync', '-a', '--exclude=lost+found/', '--stats', '--human-readable', source, destination]
@@ -68,5 +67,6 @@ else:
 with open(log_file, 'a') as log:
     log.write(message + "\n")
     log.write(f"Telegram Response: {telegram_response}\n\n")
+
 
 
