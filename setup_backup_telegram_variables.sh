@@ -113,31 +113,64 @@ if [[ "$CONFIGURE_TELEGRAM" =~ ^[Yy]$ ]]; then
 fi
 # === Step 5: Drive selection ===
 show_progress 5
-echo "🔍 Detecting drives..."
+echo "🔍 Detecting mounted drives..."
 mapfile -t drives < <(lsblk -o UUID,MOUNTPOINT,SIZE,MODEL -P | grep 'MOUNTPOINT=')
+
 if [ ${#drives[@]} -eq 0 ]; then
     echo "❌ No mounted drives found!"
-    exit 1
+    read -p "📂 Enter a folder path manually or press Enter to exit: " fallback
+    if [ -z "$fallback" ]; then
+        echo "🚪 Exiting..."
+        exit 1
+    elif [ -d "$fallback" ]; then
+        BACKUP_SOURCE="$fallback"
+        echo "✅ SOURCE: $BACKUP_SOURCE"
+        # You can repeat this logic for destination if needed
+        exit 0
+    else
+        echo "❌ Invalid folder path!"
+        exit 1
+    fi
 fi
+
 echo "📦 Available Drives:"
 for i in "${!drives[@]}"; do
     eval "${drives[$i]}"
     echo "  [$i] UUID=$UUID MOUNTPOINT=$MOUNTPOINT SIZE=$SIZE MODEL=$MODEL"
 done
-read -p "📁 Select the number of the SOURCE drive: " source_index
-eval "${drives[$source_index]}"
-BACKUP_SOURCE="$MOUNTPOINT"
-BACKUP_UUID="$UUID"
-read -p "💾 Select the number of the DESTINATION drive: " dest_index
-eval "${drives[$dest_index]}"
-BACKUP_DESTINATION="$MOUNTPOINT"
-DEST_UUID="$UUID"
+
+choose_path() {
+    local role="$1"
+    read -p "➡️ Enter the number of the $role drive OR provide a full folder path: " input
+
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        if (( input >= 0 && input < ${#drives[@]} )); then
+            eval "${drives[$input]}"
+            echo "$MOUNTPOINT"
+        else
+            echo "❌ Invalid drive number!"
+            exit 1
+        fi
+    elif [ -d "$input" ]; then
+        echo "$input"
+    else
+        echo "❌ Invalid input! Must be a valid drive number or existing folder path."
+        exit 1
+    fi
+}
+
+BACKUP_SOURCE=$(choose_path "SOURCE")
+BACKUP_DESTINATION=$(choose_path "DESTINATION")
+
 if [[ "$BACKUP_SOURCE" == "$BACKUP_DESTINATION" ]]; then
     echo "❌ Source and destination cannot be the same!"
     exit 1
 fi
-echo "✅ SOURCE: $BACKUP_SOURCE (UUID: $BACKUP_UUID)"
-echo "✅ DEST  : $BACKUP_DESTINATION (UUID: $DEST_UUID)"
+
+echo "✅ SOURCE: $BACKUP_SOURCE"
+echo "✅ DEST  : $BACKUP_DESTINATION"
+
+
 # === Step 6: Write .env file ===
 show_progress 6
 {
@@ -168,6 +201,7 @@ echo "        │ │ │ │ │"
 echo "        │ │ │ │ │"
 echo "        * * * * * command_to_run"
 echo ""
+echo " `*` can be used for disabling, e.g.: if there isn't a need for a specific weekday, only monthly, a `*` can be placed for day of week"
 echo "by using `crontab -e` you can edit manually"
 # Ask for frequency of cron job
 echo "📅 How often do you want to run the backup?"
@@ -232,3 +266,4 @@ echo "🎉 Installation finished successfully!"
 echo "✅ Repository ready at $REPO_DIR."
 echo "We will sync $BACKUP_SOURCE to $BACKUP_DESTINATION"
 echo "✅ Cron job monthly, 5:00 AM, 1st."
+echo "by using `crontab -e` you can edit manually"
