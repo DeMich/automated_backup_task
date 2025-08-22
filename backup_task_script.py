@@ -11,7 +11,7 @@ import json
 from dotenv import load_dotenv
 
 # Load backup configuration from environment variables
-load_dotenv(os.path.expanduser('~/automated_backup_task/.env_backup_telegram_variables'))
+load_dotenv(os.path.expanduser('~/automated_backup_task/automated_backup_task.env'))
 source = os.environ.get("BACKUP_SOURCE")
 if source and not source.endswith('/'):
     source += '/'
@@ -67,6 +67,7 @@ else:
 with open(log_file, 'a') as log:
     log.write(message + "\n")
     log.write(f"Telegram Response: {telegram_response}\n\n")
+
 
 
 
