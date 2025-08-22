@@ -201,8 +201,13 @@ echo "📝 Environment settings saved to $ENV_FILE."
 show_progress 6
 chmod 600 "$ENV_FILE"
 echo "🔒 Protected environment file."
+
 # === Step 8: cron job management ===
 show_progress 7
+
+# Get Python path dynamically
+PYTHON_PATH=$(which python3)
+
 # Explain cron syntax
 echo ""
 echo "🕒 CRON SCHEDULING OVERVIEW"
@@ -213,18 +218,17 @@ echo "        │ │ ┌───────────── day of month (1
 echo "        │ │ │ ┌───────────── month (1 - 12)"
 echo "        │ │ │ │ ┌───────────── day of week (0 - 7) (Sunday=0 or 7)"
 echo "        │ │ │ │ │"
-echo "        │ │ │ │ │"
 echo "        * * * * * command_to_run"
 echo ""
-echo " `*` can be used for disabling, e.g.: if there isn't a need for a specific weekday, only monthly, a `*` can be placed for day of week"
-echo "by using `crontab -e` you can edit manually"
+
 # Ask for frequency of cron job
 echo "📅 How often do you want to run the backup?"
 echo "  [1] Daily"
 echo "  [2] Weekly"
 echo "  [3] Monthly"
 read -p "Enter your choice [1-3]: " freq_choice
-# Build cron job
+
+# Build cron schedule
 case "$freq_choice" in
     1)
         read -p "⏰ At what hour (0–23) do you want to run it daily? " hour
@@ -248,26 +252,31 @@ case "$freq_choice" in
         exit 1
         ;;
 esac
-# cronjob confirmation
+
+# Final cron job command
+CRON_COMMAND="PATH=$PATH $PYTHON_PATH $REPO_DIR/backup_script.py >> $BACKUP_LOG_FILE 2>&1"
+CRON_JOB="$CRON_SCHEDULE $CRON_COMMAND"
+
+# Confirm with user
 echo ""
 echo "📝 Your cron schedule will be:"
-echo "    $CRON_SCHEDULE /usr/bin/python3 $REPO_DIR/backup_script.py"
-read -p "✅ Confirm and apply this schedule? $CRON_SCHEDULE (y/n): " confirm_cron
+echo "    $CRON_JOB"
+read -p "✅ Confirm and apply this schedule? (y/n): " confirm_cron
 if [[ ! "$confirm_cron" =~ ^[Yy]$ ]]; then
     echo "🔁 Restarting cron setup..."
-    # You could loop back or exit here
     exit 0
 fi
-#Applying cron job
-CRON_JOB="$CRON_SCHEDULE /usr/bin/python3 $REPO_DIR/backup_script.py"
-CRONTAB_CONTENT=$(crontab -l 2>/dev/null || true)
 
-if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_JOB"; then
+# Apply cron job
+CRONTAB_CONTENT=$(crontab -l 2>/dev/null || true)
+if echo "$CRONTAB_CONTENT" | grep -Fq "$CRON_COMMAND"; then
     echo "ℹ️ Cron job already exists."
 else
     (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
     echo "✅ Cron job added with schedule: $CRON_SCHEDULE"
 fi
+
+
 # === Step 9: Optional run backup task===
 show_progress 8
 read -p "🧪 Run the backup task now? (y/n): " run_backup_task
