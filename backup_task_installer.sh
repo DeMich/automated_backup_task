@@ -11,14 +11,14 @@ RESET='\033[0m'
 # === Installation steps ===
 steps=(
     "Intro"
-    "Create folders & setting up log"
-    "Install packages"
-    "Cloning/updating Git repo"
-    "Telegram notifications (optional)"
+    "Folder setup"
+    "package installation: git, python3, pip, python-dotenv"
+    "Git repo management: clone or update repo"
+    "Telegram notification (optional)"
     "Source & target selection"
-    "Write .env & secure .env"
-    "adding cron job"
-    "Test run backup task (optional)"
+    "settings storage in .env + securing .env"
+    "cron job setup"
+    "run backup task (optional)"
 )
 
 
@@ -47,12 +47,12 @@ echo "--------------------------------------------------"
 echo "This script will:"
 echo "  - Create a folder in your home directory called 'automated_backup_task' for scripts, logs & settings"
 echo "  - Install required packages (git, python3, pip, python-dotenv)"
-echo "  - Check if Git repository is missing or out of date → Clone/update the backup script repo"
-echo "  - Set up optional Telegram push notifications through a Telegram bot (must be preconfigured)"
-echo "  - Set up source & target folders/drives"
+echo "  - Check if Git repository is missing or out of date → Clone/update the repository"
+echo "  - Set up optional Telegram push notifications through a Telegram bot (bot must be preconfigured)"
+echo "  - Set up source & target for backup. Available mounted drives will be chown, manual folder path is also possible"
 echo "  - Write a secured .env file with your settings"
-echo "  - Add a cron job to run backups monthly, weekly or daily, in what pattern and at what time?"
-echo "  - Optionally run a test backup task"
+echo "  - Add a cron job to run backups monthly, weekly or daily. User can choose frequency"
+echo "  - Give you the option for running the backup script now"
 echo ""
 read -p "❓ Do you want to proceed with the installation? (y/n): " proceed
 if [[ ! "$proceed" =~ ^[Yy]$ ]]; then
@@ -268,17 +268,33 @@ else
     (echo "$CRONTAB_CONTENT"; echo "$CRON_JOB") | crontab -
     echo "✅ Cron job added with schedule: $CRON_SCHEDULE"
 fi
-# === Step 9: Optional test backup ===
+# === Step 9: Optional run backup task===
 show_progress 8
-read -p "🧪 Run a test backup now? (y/n): " test_backup
-if [[ "$test_backup" =~ ^[Yy]$ ]]; then
+read -p "🧪 Run the backup task now? (y/n): " run_backup_task
+if [[ "$run_backup_task" =~ ^[Yy]$ ]]; then
     python3 "$REPO_DIR/backup_script.py"
-    echo "✅ Test backup complete. Logs: $BACKUP_LOG_FILE"
+    echo "✅ backup task complete. Log: $BACKUP_LOG_FILE"
 else
     echo "ℹ️ Skipped test backup."
 fi
+echo ""
+echo "Quick summary:"
 echo "🎉 Installation finished successfully!"
 echo "✅ Repository ready at $REPO_DIR."
+echo "Telegram settings: Bot token: $BOT_TOKEN & Chat_id: $CHAT_ID"
 echo "We will sync $BACKUP_SOURCE to $BACKUP_DESTINATION"
-echo "✅ Cron job monthly, 5:00 AM, 1st."
+echo "✅ Cron job added with schedule: $CRON_SCHEDULE"
 echo "by using `crontab -e` you can edit manually"
+echo "🕒 CRON SCHEDULING OVERVIEW"
+echo "A cron expression has 5 fields: minute hour day month weekday"
+echo "Format: ┌───────────── minute (0 - 59)"
+echo "        │ ┌───────────── hour (0 - 23)"
+echo "        │ │ ┌───────────── day of month (1 - 31)"
+echo "        │ │ │ ┌───────────── month (1 - 12)"
+echo "        │ │ │ │ ┌───────────── day of week (0 - 7) (Sunday=0 or 7)"
+echo "        │ │ │ │ │"
+echo "        │ │ │ │ │"
+echo "        * * * * * command_to_run"
+echo ""
+echo " `*` can be used for disabling, e.g.: if there isn't a need for a specific weekday, only monthly, a `*` can be placed for day of week"
+
